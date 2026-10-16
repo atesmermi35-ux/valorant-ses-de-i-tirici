@@ -8,7 +8,7 @@ Windows 11 / RTX 3050 Laptop 4 GB için Türkçe **VCClient kurulum ve başlatma
 
 1. Depo klasörünü Windows bilgisayarına indirip çıkar.
 2. [Python'ın Windows sürümünü](https://www.python.org/downloads/windows/) kur (3.10 veya üzeri; öneri 3.12). Kurulumda **Tcl/Tk** ve **Python launcher** açık kalsın. VoiceBridge için `pip install` gerekmez.
-3. **`BASLAT.cmd`** dosyasına çift tıkla.
+3. ZIP'e sağ tıkla → **Tümünü Ayıkla** → **Ayıkla**. Açılan normal klasördeki **`BASLAT.cmd`** dosyasına çift tıkla. ZIP'in içinden çalıştırma; `main.py` dosyası ve `voicebridge` klasörü başlatıcının yanında bulunmalı.
 4. **Resmî CUDA sürümlerini getir** → uygun sürümü seç → **Seçili sürümü indir ve doğrula**. Dosya adı ve indirme boyutu listede görünür. Kurulum çalıştırılabilir dosyaları kendiliğinden açmaz.
 5. **Ses motorunu başlat**. İlk açılışta VCClient kendi yardımcı model dosyalarını indirebilir. Arayüz açılıp model yüklendiğinde, kulaklığında dönüşümü dinleyerek çalıştığını doğrula.
 6. Motor içinde kullanım koşulları uygun bir kadın sesi modeli seç/yükle. Başlangıçta motorun örnek modellerini dinleyebilirsin; örneklerin sesini, dilini ve kullanım koşullarını değerlendir. Bu sürüm belirli bir Türkçe kadın sesini otomatik seçmez.
@@ -51,6 +51,10 @@ Sesin genç yetişkin kadın sesi gibi algılanması modele, sesine ve konuşma 
 Valorant ile aynı 4 GB VRAM paylaşılır. Oyunun FPS'ini sınırlamak GPU'da boşluk bırakabilir. Kesilme varsa CHUNK'ı büyüt, INDEX'i azalt, gerekirse daha hafif model/motor kullan. Motorun `res` süresi `buf` süresini sürekli aşıyorsa işleme yetişmiyor olabilir. Motorun gecikme göstergesi Windows sürücüsü, sanal kablo ve oyundaki tüm gecikmeyi ölçmez. Belirli bir FPS, gecikme veya ses kalitesi garantisi verilmez.
 
 ## Dosyalar ve indirme doğrulaması
+
+### Pencere açılıp kapanıyorsa
+
+`can't open file ... Temp ... zip ... main.py` hatası, başlatıcının ZIP içinden çalıştırıldığını gösterir. ZIP'e sağ tıklayıp **Tümünü Ayıkla** seç; çıkarılan klasörden başlat. Python'ı yeniden kurman gerekmez. Eksik dosyalar yeni başlatıcıda doğrudan açıklanır. Python uygulaması başka bir nedenle çökerse hata raporu `%TEMP%\VoiceBridge-startup.log` dosyasına yazılır ve Not Defteri'nde açılır.
 
 VoiceBridge ayarları ve motorlar `%LOCALAPPDATA%\VoiceBridge` altında tutulur. Depo içine model veya çok GB'lık motor dosyaları yazılmaz. Önceki kurulum yeni bir indirme başarısız olduğunda korunur. İndirme iptal edildiğinde geçici dosyalar temizlenir; bu sürümde kaldığı yerden devam etme yoktur.
 
