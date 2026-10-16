@@ -9,7 +9,7 @@ Windows 11 / RTX 3050 Laptop 4 GB için Türkçe **VCClient kurulum ve başlatma
 1. Güncel ZIP'in tamamını çıkar. Python **3.12** kurulu olsun.
 2. **DOGAL_SES_DENE.cmd** dosyasını aç.
 3. Bilgisayarındaki kendi konuşma kaydını seç; yeni WAV dosyasının kaydedileceği yeri seç.
-4. İlk kurulum için birkaç GB indirme gerekebilir. Model kendi ayrı Python ortamına kurulur. Sonuç hazır olunca varsayılan ses oynatıcın açılır. Kayıtlar internete yüklenmez.
+4. İlk kurulum yüzlerce MB indirebilir. Bu ilk dosya denemesi **CPU ile**, `%LOCALAPPDATA%\VoiceBridge\natural` altında ayrı ortamda çalışır. Eğitim için kullanılan CUDA ortamını değiştirmez. Sonuç hazır olunca varsayılan ses oynatıcın açılır. Kayıtlar internete yüklenmez.
 
 Seçilen başlangıç tınısı, kamu malı **LJ Speech LJ001-0001** kaydından alınan nötr yetişkin kadın sesi adayıdır. Referans İngilizcedir; girişteki Türkçe konuşma doğrudan ses olarak dönüştürülür. Metin okuma/TTS kullanılmaz. Kaynak ve lisans bilgileri [referans notunda](assets/voices/NOTICE.md) bulunur. Belirli bir yaşta algılanma, doğallık ve tüm Türkçe seslerin hatasız korunması dinleme testi olmadan garanti edilemez.
 

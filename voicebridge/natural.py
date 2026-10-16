@@ -126,13 +126,13 @@ def local():
             raise core.SetupError("Mevcut dosyanın üzerine yazılmayacak; yeni bir çıktı adı seç.")
     finally:
         root.destroy()
-    home = core.app_home() / "training"
+    home = core.app_home() / "natural"
     environment = home / "python312"
     python = environment / "Scripts/python.exe"
     if not python.is_file():
         venv.EnvBuilder(with_pip=True).create(environment)
-    print("Model ortamı hazırlanıyor. İlk kurulum birkaç GB indirebilir.", flush=True)
-    subprocess.run([str(python), "-m", "pip", "install", "torch==2.4.0+cu118", "torchaudio==2.4.0+cu118", "--index-url", "https://download.pytorch.org/whl/cu118"], check=True)
+    print("CPU ses denemesi hazırlanıyor. İlk kurulum yüzlerce MB indirebilir.", flush=True)
+    subprocess.run([str(python), "-m", "pip", "install", "torch==2.4.0+cpu", "torchaudio==2.4.0+cpu", "--index-url", "https://download.pytorch.org/whl/cpu"], check=True)
     project = Path(__file__).resolve().parent.parent
     subprocess.run([str(python), "-m", "pip", "install", "-r", str(project / "requirements-natural.txt")], check=True)
     engine = training.engine_source(home)

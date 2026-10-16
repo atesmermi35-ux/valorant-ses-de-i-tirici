@@ -176,7 +176,7 @@ class App:
         ttk.Button(buttons, text="Doğal ses kaydı denemesi ↗", command=self.natural_preview).pack(side="left")
         self.download_button = ttk.Button(setup, text="Resmî indirme sayfası ↗", command=lambda: webbrowser.open(core.OFFICIAL_DOWNLOADS))
         self.download_button.pack(anchor="w", pady=(14, 0))
-        ttk.Label(setup, text="Kayıt denemesinde kendi ses dosyanı seçip kadın sesiyle dönüştürülmüş WAV'ı dinleyebilirsin. İlk kurulum birkaç GB indirebilir. Bu deneme canlı oyun mikrofonu bağlamaz.", wraplength=780, style="Sub.TLabel").pack(anchor="w", pady=(10, 0))
+        ttk.Label(setup, text="Kayıt denemesinde kendi ses dosyanı seçip dönüştürülmüş WAV'ı dinleyebilirsin. İlk CPU kurulumu yüzlerce MB indirebilir. Bu deneme canlı oyun mikrofonu bağlamaz.", wraplength=780, style="Sub.TLabel").pack(anchor="w", pady=(10, 0))
         route_buttons = ttk.Frame(route)
         route_buttons.pack(fill="x", pady=(0, 8))
         ttk.Button(route_buttons, text="VB-CABLE resmî sitesi ↗", command=lambda: webbrowser.open(core.VIRTUAL_CABLE)).pack(side="left")
