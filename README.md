@@ -2,7 +2,41 @@
 
 Windows 11 / RTX 3050 Laptop 4 GB için Türkçe **VCClient kurulum ve başlatma yardımcısı**. Hedef kullanım: mikrofon sesini genç yetişkin kadın sesine dönüştüren bir modeli Valorant sesli sohbetinde kullanmak.
 
-**Durum: ilk sürüm.** Bu depo yeni bir ses dönüşüm ağı veya eğitilmiş kadın sesi modeli içermez. Ses dönüşümünü ayrı çalışan [w-okada VCClient](https://github.com/w-okada/voice-changer) yapar. VoiceBridge resmî Windows CUDA ZIP'ini bulur, doğrular ve kurar; motoru açar, NVIDIA bilgisini gösterir ve oyun bağlantısı/ayar adımlarını sunar. Model seçimi, mikrofon seçimi ve dönüşümü başlatma motorun kendi arayüzünde yapılır. Henüz Windows cihazında uçtan uca ses veya FPS ölçümü yapılmadı.
+**Durum: ilk sürüm.** Bu depo eğitilmiş kadın sesi ağırlıkları içermez. `BASLAT.cmd`, ayrı çalışan [w-okada VCClient](https://github.com/w-okada/voice-changer) için kurulum ve başlatma yardımcısıdır. `MODEL_EGIT.cmd` ise kalite öncelikli [Seed-VC](https://github.com/Plachtaa/seed-vc) model eğitimi için ayrı, deneysel bir akıştır. İki motorun model biçimleri birbirinin yerine kullanılamaz. Henüz Windows cihazında uçtan uca ses veya FPS ölçümü yapılmadı.
+
+## Kalite öncelikli model hazırlığı ve eğitimi
+
+Gecikmeden çok doğallık istendiğinde aday profil **DogalKadinTR / Seed-VC Whisper-small + BigVGAN** olarak seçildi. Bu, işitilerek onaylanmış bir kadın sesi veya sıfırdan eğitilmiş model değildir. Başlangıç ses tonu seçilen referans kaydından gelir; profil tek başına belirli bir yaş ya da tını üretmez. Hazırlanmış referansla eğitimsiz (zero-shot) dönüşüm de mümkündür; kişiye özel ince ayar ayrı bir işlemdir. Kısa veriyle ince ayar yapılabilmesi kaliteli sonucu garanti etmez.
+
+Windows'ta eğitim denemesi için:
+
+1. Güncel ZIP'in tamamını çıkar. Python **3.12** kurulu olsun.
+2. Kullanım hakkın olan, tek kadın konuşmacıya ait temiz kayıtları ayrı bir klasöre koy. `C:\Axtenix\SesVerisi` kullanılabilir; klasörü bilgisayarında sen seçersin. Müzik ve başka konuşmacıları önceden ayır.
+3. **MODEL_EGIT.cmd** dosyasını açıp kayıt klasörünü seç.
+4. Ayrı Python ortamı ve sabit sürümlü Seed-VC kaynağı indirilir; birkaç GB alan/internet gerekebilir. Kaynak ZIP'i tam commit'e ve SHA-256'ya sabitlenmiştir. Ana uygulamanın Python ortamı değiştirilmez.
+5. 22.050 Hz mono, 1–6 saniyelik veri parçaları ve 15 saniyeye kadar referans WAV hazırlanır. Orijinal kayıtlar korunur. Bu işlem müzik ayırma, konuşmacı ayırma, otomatik kalite değerlendirmesi veya gürültü temizleme yapmaz. Parça sınırları cümle sınırlarıyla örtüşmeyebilir.
+6. 100 adımlık, batch-size 1 ince ayar **denemesi** başlar. 4 GB GPU belleğine sığması henüz test edilmedi; diğer GPU uygulamalarını kapat. CUDA/bellek hatası olursa eğitim tamamlanmış sayılmaz. Yalnızca adımlar tamamlanıp checkpoint oluştuğunda durum raporu eğitildi olarak işaretlenir.
+
+Veriler ve çıktılar `%LOCALAPPDATA%\VoiceBridge\training\DogalKadinTR-…` içinde kalır; GitHub'a yüklenmez. `status.json`, tamamlanan gerçek optimizasyon adımlarını, son kaybı ve varsa hatayı kaydeder. Başarılı çıktı `runs/DogalKadinTR/ft_model.pth` ve `seed-quality.yml` dosyalarıdır. Eğitim sonrası her zaman referans WAV da gerekir. **Bu Seed-VC checkpoint'i RVC modeli olarak VCClient'a yüklenemez.**
+
+Çıktıyı Seed-VC kaynak klasöründe kendi Python ortamıyla denemek için (yer tutucuları kendi dosya yollarınla değiştir):
+
+```console
+python inference.py --source "kaynak.wav" --target "referans.wav" --output "sonuc" --checkpoint "ft_model.pth" --config "seed-quality.yml" --diffusion-steps 50 --inference-cfg-rate 0.7 --length-adjust 1.0 --f0-condition False --fp16 True
+```
+
+`50` difüzyon adımı kalite denemesi içindir; Türkçe anlaşılırlık ve doğallık dinleme testinde doğrulanmalıdır. Konuşmayı metne çevirip yeniden okutmaz; Türkçe seslerin korunması yine de ölçülmeden garanti edilemez. Üretici ince ayarın bazı durumlarda kelime hatalarını artırabileceğini belirtiyor. Önce orijinal hazır model ve aynı referansla karşılaştır; ince ayar daha iyi çıkmazsa hazır modeli kullan.
+
+Motorun ayrı `real-time-gui.py` arayüzü de özel checkpoint/config alabilir; canlı mikrofon, modelin 4 GB GPU'ya sığması ve VB-CABLE yönlendirmesi bu yeni akışta henüz doğrulanmadı. Eğitim paketi hazır olması Valorant ses yolunun hazır olduğu anlamına gelmez. Seed-VC kodu/modeli GPL-3.0 koşullarına tabidir; indirilen kaynak kendi lisansını içerir.
+
+Bulutta doğrudan veri hazırlamak/eğitim girişimini izlemek için:
+
+```console
+python -m voicebridge.training prepare --source "/kaynak/kayit.wav" --work "/yeni/calisma"
+python -m voicebridge.training run --source "/kaynak/kayit.wav" --work "/baska/yeni/calisma" --engine "/seed-vc/kaynagi" --device cpu --steps 1
+```
+
+CPU komutu yalnızca açıkça seçilen deneme yoludur; eğitim hızı veya kaliteli sonuç vaadi değildir. CUDA otomatik olarak var kabul edilmez. Kaynaklar ve model ağırlıkları internetten indirilemiyorsa optimizasyon başlamaz; `completed_steps: 0` olarak raporlanır. Windows başlatıcısı ve gerçek model çıktısı doğrulanmadan bu akış hazır kabul edilmemelidir.
 
 ## En kısa kurulum
 
