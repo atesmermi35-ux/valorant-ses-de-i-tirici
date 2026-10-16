@@ -136,6 +136,18 @@ class InstallTests(unittest.TestCase):
         self.assertFalse(list(self.root.glob("install-*")))
         self.assertEqual(list((self.root / "engines").iterdir()), [previous.parent])
 
+    @unittest.skipIf(os.name == "nt", "Windows alias handling is exercised by the real TEMP installation test")
+    def test_install_through_directory_alias_reuses_resolved_launcher(self):
+        real = self.root / "real-home"
+        real.mkdir()
+        alias = self.root / "home-alias"
+        alias.symlink_to(real, target_is_directory=True)
+        with local_download(self.payload):
+            launcher = core.install(self.release, alias, self.progress)
+        self.assertTrue(launcher.is_file())
+        self.assertTrue(launcher.is_relative_to(real))
+        self.assertEqual(core.install(self.release, alias, self.progress), launcher)
+
     def test_truncated_download_not_installed(self):
         with local_download(self.payload[:-10]), self.assertRaises(core.SetupError):
             core.install(self.release, self.root, self.progress)

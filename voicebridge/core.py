@@ -247,12 +247,13 @@ def install(release: Release, home: Path, progress: Callable[[str, float], None]
         staging = work / "unpacked"
         extract_archive(archive, staging, progress, cancel)
         launcher = find_launcher(staging)
-        relative = launcher.relative_to(staging)
+        # find_launcher resolves aliases, including Windows 8.3 short names.
+        relative = launcher.relative_to(staging.resolve())
         (staging / "voicebridge-install.json").write_text(json.dumps(asdict(release), indent=2), encoding="utf-8")
         _cancel(cancel)
         staging.rename(final)
     progress("Motor kuruldu. Başlat düğmesiyle açabilirsin.", 100)
-    return final / relative
+    return (final / relative).resolve()
 
 
 def launch(path: Path) -> subprocess.Popen:
