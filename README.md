@@ -2,11 +2,34 @@
 
 Windows 11 / RTX 3050 Laptop 4 GB için Türkçe **VCClient kurulum ve başlatma yardımcısı**. Hedef kullanım: mikrofon sesini genç yetişkin kadın sesine dönüştüren bir modeli Valorant sesli sohbetinde kullanmak.
 
-**Durum: ilk sürüm.** Bu depo eğitilmiş kadın sesi ağırlıkları içermez. `BASLAT.cmd`, ayrı çalışan [w-okada VCClient](https://github.com/w-okada/voice-changer) için kurulum ve başlatma yardımcısıdır. `MODEL_EGIT.cmd` ise kalite öncelikli [Seed-VC](https://github.com/Plachtaa/seed-vc) model eğitimi için ayrı, deneysel bir akıştır. İki motorun model biçimleri birbirinin yerine kullanılamaz. Henüz Windows cihazında uçtan uca ses veya FPS ölçümü yapılmadı.
+**Durum: geliştirme sürümü.** `DOGAL_SES_DENE.cmd`, OpenVoice V2 ve açık lisanslı kadın sesi referansıyla kendi ses kaydını **yerel WAV dosyasına** dönüştürür. `BASLAT.cmd`, ayrı çalışan [w-okada VCClient](https://github.com/w-okada/voice-changer) için kurulum yardımcısıdır. `MODEL_EGIT.cmd`, deneysel Seed-VC eğitimidir. Henüz Windows'ta canlı mikrofon, Valorant bağlantısı veya FPS ölçümü yapılmadı. Bu farklı motorların modelleri birbirinin yerine kullanılamaz.
 
-## Kalite öncelikli model hazırlığı ve eğitimi
+## Doğal kadın sesi için ilk yerel deneme
 
-Gecikmeden çok doğallık istendiğinde aday profil **DogalKadinTR / Seed-VC Whisper-small + BigVGAN** olarak seçildi. Bu, işitilerek onaylanmış bir kadın sesi veya sıfırdan eğitilmiş model değildir. Başlangıç ses tonu seçilen referans kaydından gelir; profil tek başına belirli bir yaş ya da tını üretmez. Hazırlanmış referansla eğitimsiz (zero-shot) dönüşüm de mümkündür; kişiye özel ince ayar ayrı bir işlemdir. Kısa veriyle ince ayar yapılabilmesi kaliteli sonucu garanti etmez.
+1. Güncel ZIP'in tamamını çıkar. Python **3.12** kurulu olsun.
+2. **DOGAL_SES_DENE.cmd** dosyasını aç.
+3. Bilgisayarındaki kendi konuşma kaydını seç; yeni WAV dosyasının kaydedileceği yeri seç.
+4. İlk kurulum için birkaç GB indirme gerekebilir. Model kendi ayrı Python ortamına kurulur. Sonuç hazır olunca varsayılan ses oynatıcın açılır. Kayıtlar internete yüklenmez.
+
+Seçilen başlangıç tınısı, kamu malı **LJ Speech LJ001-0001** kaydından alınan nötr yetişkin kadın sesi adayıdır. Referans İngilizcedir; girişteki Türkçe konuşma doğrudan ses olarak dönüştürülür. Metin okuma/TTS kullanılmaz. Kaynak ve lisans bilgileri [referans notunda](assets/voices/NOTICE.md) bulunur. Belirli bir yaşta algılanma, doğallık ve tüm Türkçe seslerin hatasız korunması dinleme testi olmadan garanti edilemez.
+
+OpenVoice V2 tonu dönüştürür. Kaynak çok pesse, akustik perde ölçümüne göre en fazla +6 yarım seslik yükseltme denenir; mevcut perdeyi düşürmez. Fark küçükse perdeye müdahale edilmez. Uzun kayıtlar 6 saniyelik örtüşen bloklarla işlenir; kaynak tını özeti her blokta yeniden hesaplanır. Her sonucun yanında `.json` teknik raporu oluşur. Otomatik perde uyumu seste artefakt oluşturursa CLI'da `--pitch none` ile karşılaştırılabilir.
+
+```console
+python -m voicebridge.natural convert --source "kendi-kaydim.wav" --output "yeni-sonuc.wav" --engine "/seed-vc/kaynagi" --pitch auto
+```
+
+Bu akış **dosya üzerinden ses denemesidir**; canlı oyun mikrofonu bağlamaz. Önce kendi sesinle örneği dinleyerek tınıyı değerlendirmek içindir. Windows CUDA kurulumu ve aygıt bağlantısı hâlâ o bilgisayarda doğrulanmalıdır.
+
+### Mevcut doğrulama ve sınırı
+
+Bulutta 57 saniyelik kullanıcı kaydıyla Seed-VC için **100 gerçek optimizasyon adımı** tamamlandı ve checkpoint oluştu. Ancak 6 saniyelik Türkçe dönüşümde otomatik konuşma tanıma ciddi içerik uyuşmazlığı gösterdi; bu checkpoint kullanıma hazır olarak işaretlenmedi ve özel çalışma alanında tutuldu. Aynı kısa örnekte OpenVoice tabanlı dönüşüm kaynak cümleyi daha iyi koruduğu için yerel deneme yoluna seçildi.
+
+Bu karşılaştırma yalnızca tek kısa örneğin Whisper-small transkriptleri arasındadır; insan tarafından doğrulanmış metin, doğallık puanı veya genellenebilir başarı oranı değildir. Orijinal konuşmanın tanınmasında da hatalar vardır. Bir checkpoint oluşması, modelin Türkçe için yeterli olduğu anlamına gelmez. Kullanıcı kayıtları ve eğitilmiş özel checkpoint'ler bu depoda paylaşılmaz.
+
+## Deneysel Seed-VC model hazırlığı ve eğitimi
+
+**Bu rota mevcut Türkçe anlaşılırlık ekranından geçmedi; araştırma amaçlıdır.** Aday profil **DogalKadinTR / Seed-VC Whisper-small + BigVGAN** kullanır. Başlangıç ses tonu seçilen referans kaydından gelir; profil tek başına belirli bir yaş ya da tını üretmez. Hazırlanmış referansla eğitimsiz (zero-shot) dönüşüm de mümkündür; kişiye özel ince ayar ayrı bir işlemdir. Kısa veriyle ince ayar yapılabilmesi kaliteli sonucu garanti etmez.
 
 Windows'ta eğitim denemesi için:
 
@@ -26,6 +49,14 @@ python inference.py --source "kaynak.wav" --target "referans.wav" --output "sonu
 ```
 
 `50` difüzyon adımı kalite denemesi içindir; Türkçe anlaşılırlık ve doğallık dinleme testinde doğrulanmalıdır. Konuşmayı metne çevirip yeniden okutmaz; Türkçe seslerin korunması yine de ölçülmeden garanti edilemez. Üretici ince ayarın bazı durumlarda kelime hatalarını artırabileceğini belirtiyor. Önce orijinal hazır model ve aynı referansla karşılaştır; ince ayar daha iyi çıkmazsa hazır modeli kullan.
+
+VoiceBridge içinden dosya dönüştürme kontrolü de bulunur. Ayrı model Python ortamıyla, depo klasöründen:
+
+```console
+python -m voicebridge.conversion --engine "/seed-vc/kaynagi" --checkpoint "/calisma/runs/DogalKadinTR/ft_model.pth" --config "/calisma/seed-quality.yml" --source "/kaynak.wav" --reference "/referans.wav" --output "/sonuc.wav"
+```
+
+Bu yardımcı 50 adımlık kalite profilini uygular, CPU'da Whisper'ı float32 yükler, çıktının boş/sessiz olmadığını ve süresinin kaynakla uyumunu kontrol eder. Bu sinyal kontrolleri doğal ses veya doğru telaffuz kanıtı değildir. Canlı mikrofon bağlantısı kurmaz.
 
 Motorun ayrı `real-time-gui.py` arayüzü de özel checkpoint/config alabilir; canlı mikrofon, modelin 4 GB GPU'ya sığması ve VB-CABLE yönlendirmesi bu yeni akışta henüz doğrulanmadı. Eğitim paketi hazır olması Valorant ses yolunun hazır olduğu anlamına gelmez. Seed-VC kodu/modeli GPL-3.0 koşullarına tabidir; indirilen kaynak kendi lisansını içerir.
 

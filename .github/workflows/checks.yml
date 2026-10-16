@@ -16,7 +16,15 @@ jobs:
         with:
           python-version: '3.12'
       - name: Test installer and desktop integration
-        run: python -m unittest discover -s tests -v
+        shell: python
+        run: |
+          import os, sys, unittest
+          sys.path.insert(0, os.getcwd())
+          result = unittest.TextTestRunner(verbosity=2).run(unittest.defaultTestLoader.discover('tests'))
+          for test, traceback in result.errors + result.failures:
+              message = (str(test) + '\n' + traceback).replace('%', '%25').replace('\r', '%0D').replace('\n', '%0A')
+              print('::error::' + message, flush=True)
+          sys.exit(0 if result.wasSuccessful() else 1)
       - name: Package Windows companion
         if: runner.os == 'Windows'
         run: |

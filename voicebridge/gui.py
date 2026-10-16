@@ -5,6 +5,8 @@ from __future__ import annotations
 import os
 from pathlib import Path
 import queue
+import subprocess
+import sys
 import threading
 import tkinter as tk
 from tkinter import filedialog, messagebox, ttk
@@ -116,6 +118,7 @@ class App:
         self.busy = False
         self.releases: list[core.Release] = []
         self.process = None
+        self.preview_process = None
         self.closed = False
         root.title(f"VoiceBridge {__version__} · Valorant ses kurulumu")
         root.geometry("960x760")
@@ -134,9 +137,13 @@ class App:
         body.pack(fill="both", expand=True)
         ttk.Label(body, text="VOICEBRIDGE", style="Title.TLabel").pack(anchor="w")
         ttk.Label(body, text="Gerçek zamanlı ses dönüşümü için kurulum ve başlatma yardımcısı", style="Sub.TLabel").pack(anchor="w", pady=(2, 6))
-        ttk.Label(body, text="Windows 11  ·  RTX 3050 Laptop / 4 GB  ·  18–20 yaş kadın sesi hedefi", style="Sub.TLabel").pack(anchor="w", pady=(0, 18))
+        ttk.Label(body, text="Windows 11  ·  RTX 3050 Laptop / 4 GB  ·  Doğal kadın sesi denemesi", style="Sub.TLabel").pack(anchor="w", pady=(0, 18))
         tabs = ttk.Notebook(body)
         tabs.pack(fill="both", expand=True)
+        footer = ttk.Frame(body)
+        footer.pack(fill="x", pady=(10, 0))
+        ttk.Label(footer, text="GPL-3.0 · Garanti verilmez.", style="Sub.TLabel").pack(side="left")
+        ttk.Button(footer, text="Kaynak ve lisans ↗", command=lambda: webbrowser.open("https://github.com/atesmermi35-ux/valorant-ses-de-i-tirici/blob/main/LICENSE")).pack(side="right")
         setup = ttk.Frame(tabs, padding=18)
         route = ttk.Frame(tabs, padding=12)
         settings = ttk.Frame(tabs, padding=18)
@@ -166,9 +173,10 @@ class App:
         self.select_button.pack(side="left")
         self.launch_button = ttk.Button(buttons, text="Ses motorunu başlat ↗", command=self.start_engine)
         self.launch_button.pack(side="left", padx=8)
+        ttk.Button(buttons, text="Doğal ses kaydı denemesi ↗", command=self.natural_preview).pack(side="left")
         self.download_button = ttk.Button(setup, text="Resmî indirme sayfası ↗", command=lambda: webbrowser.open(core.OFFICIAL_DOWNLOADS))
         self.download_button.pack(anchor="w", pady=(14, 0))
-        ttk.Label(setup, text="Katalog erişilemiyorsa resmî Windows CUDA paketini indirip çıkar; ardından mevcut motoru seç. Bu uygulama sesi henüz kendi başına dönüştürmez.", wraplength=780, style="Sub.TLabel").pack(anchor="w", pady=(10, 0))
+        ttk.Label(setup, text="Kayıt denemesinde kendi ses dosyanı seçip kadın sesiyle dönüştürülmüş WAV'ı dinleyebilirsin. İlk kurulum birkaç GB indirebilir. Bu deneme canlı oyun mikrofonu bağlamaz.", wraplength=780, style="Sub.TLabel").pack(anchor="w", pady=(10, 0))
         route_buttons = ttk.Frame(route)
         route_buttons.pack(fill="x", pady=(0, 8))
         ttk.Button(route_buttons, text="VB-CABLE resmî sitesi ↗", command=lambda: webbrowser.open(core.VIRTUAL_CABLE)).pack(side="left")
@@ -321,6 +329,22 @@ class App:
     def check_gpu(self):
         self.gpu_status.set("NVIDIA bilgisi okunuyor…")
         self.work(core.gpu_report, self.gpu_status.set)
+
+    def natural_preview(self):
+        if os.name != "nt":
+            messagebox.showinfo("Windows denemesi", "Yerel ses denemesini Windows bilgisayarında çalıştır.", parent=self.root)
+            return
+        if getattr(sys, "frozen", False):
+            messagebox.showinfo("Kaynak paketi gerekiyor", "Bu deneme için güncel kaynak ZIP'ini çıkarıp DOGAL_SES_DENE.cmd dosyasını aç. Python 3.12 gerekir.", parent=self.root)
+            return
+        if self.preview_process is not None and self.preview_process.poll() is None:
+            messagebox.showinfo("Deneme açık", "Ses denemesi penceresi zaten açık.", parent=self.root)
+            return
+        code = "from voicebridge.natural import main\ntry:\n main()\nfinally:\n input('Pencereyi kapatmak icin Enter...')\n"
+        try:
+            self.preview_process = subprocess.Popen([sys.executable, "-c", code, "local"], cwd=Path(__file__).resolve().parent.parent, creationflags=subprocess.CREATE_NEW_CONSOLE)
+        except OSError as exc:
+            messagebox.showerror("Deneme açılamadı", str(exc), parent=self.root)
 
     def close(self):
         if self.busy:
