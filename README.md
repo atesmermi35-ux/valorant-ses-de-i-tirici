@@ -1,9 +1,9 @@
-# DogalKadinTR RVC initial candidate
+# DogalKadinTR RVC experimental models
 
-Download DogalKadinTR-RVC.zip and extract all files. Upload the .pth and .index in VCClient.
+Latest: DogalKadinTR-RVC-100.zip (100 epochs, 800 optimizer steps). Original: DogalKadinTR-RVC.zip (10 epochs).
 
-RVC v2, 32kHz, F0 enabled, speaker 0. Fine-tuned for 10 epochs / 80 steps on the previously supplied approximately 57-second target recording.
+Extract all files and upload the .pth and .index in VCClient. RVC v2, 32kHz, F0 enabled, speaker 0.
 
-VCClient synthesizer load and CPU audio smoke checks passed. Naturalness, real male microphone input, Windows live audio and Valorant performance are not validated. Turkish ASR comparison was inconclusive; this is an initial experimental candidate, not a quality-approved production voice.
+Same approximately 57-second authorized target recording. VCClient synthesizer load and audio smoke checks passed. Naturalness, Turkish intelligibility, real male microphone and Windows/Valorant performance remain unverified. More epochs do not guarantee better sound.
 
-SHA256 ZIP: 20672e3a5cef6a81ec98555a47af09a4e8c278e4be3203a22e5d576d2f54ab51
+100-epoch ZIP SHA256: b6fa2c673fe4aa5d7dff1fb4c8d151b2009d2797142eae778a51aa571296e539
