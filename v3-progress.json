@@ -1,10 +1,10 @@
 {
-  "completed_epochs": 0,
+  "completed_epochs": 1,
   "target_epochs": 50,
-  "completed_steps": 0,
-  "status": "preparing",
-  "latest_model_epoch": null,
-  "model_sha256": null,
-  "updated_at_utc": "2026-10-17T23:27:02Z",
+  "completed_steps": 27,
+  "status": "training",
+  "latest_model_epoch": 1,
+  "model_sha256": "830f6b47be1bafe34080cab91c424423dab8d9aa61febc39067cc0d0f34747d4",
+  "updated_at_utc": "2026-10-17T23:33:21Z",
   "quality_approved": false
 }

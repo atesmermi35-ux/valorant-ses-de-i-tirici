@@ -49,7 +49,21 @@ with (HOME/'publish.lock').open('w') as lock:
  for path in [HOME/'cpu_train.py',HOME/'publish.py',HOME/'supervise.py',HOME/'download.py',HOME/'prepare.py',HOME/'requirements-tested.txt']:
   if path.is_file():payloads['training-tools/v3/'+path.name]=path
  progress={'completed_epochs':epoch,'target_epochs':50,'completed_steps':a.steps,'status':'trained_compatible_quality_unverified' if epoch==50 else ('training' if epoch else 'preparing'),'latest_model_epoch':previous.get('model_epoch'),'model_sha256':previous.get('archive_sha256'),'updated_at_utc':time.strftime('%Y-%m-%dT%H:%M:%SZ',time.gmtime()),'quality_approved':False}
+ config_file=EXP/'config.json'
+ if config_file.is_file():payloads['training-tools/v3/config.json']=config_file
+ provenance=ROOT/'model-provenance.json'
+ if provenance.is_file():payloads['training-tools/v3/model-provenance.json']=provenance
  progresspath=HOME/'progress-public.json';progresspath.write_text(json.dumps(progress,indent=2));payloads['v3-progress.json']=progresspath
+ from datetime import datetime
+ from zoneinfo import ZoneInfo
+ stamp=datetime.now(ZoneInfo('Europe/Istanbul')).strftime('%d.%m.%Y %H:%M')
+ page=HOME/'progress-public.md'
+ text=f'# Yeni kayıtla RVC modeli\n\n**Son kaydedilen ilerleme: {epoch}/50 epoch.**\n\nSon güncelleme: {stamp} (Türkiye saati).\n\n'
+ if previous.get('model_epoch'):
+  text+=f'**İndirilebilir son model: {previous["model_epoch"]} epoch.**\n\n[Model ZIP dosyasını indir](https://github.com/atesmermi35-ux/valorant-ses-de-i-tirici/raw/refs/heads/voice-model/DogalKadinTR-v3-latest.zip)\n\nZIP dosyasının tamamını ayıkla; VCClient model yüklemesinde .pth ve .index dosyalarını seç.\n\n'
+ else:text+='Henüz yeni model ZIP dosyası oluşmadı.\n\n'
+ text+='Hedef 50 epoch. Model yedekleri ilk epoch ve her 10 epoch sonrasında güncellenir. Bu sayfa son kaydedilen durumu gösterir; güncel kaydı görmek için sayfayı yenile. Doğallık ve gerçek mikrofon/Valorant kalitesi henüz dinleyerek doğrulanmadı.\n'
+ page.write_text(text);payloads['V3-DURUM.md']=page
  git('fetch','origin','refs/heads/voice-model:refs/remotes/origin/voice-model')
  parent=git('rev-parse','refs/remotes/origin/voice-model')
  # Git trees are nested, so use a temporary alternate index to preserve all existing files.
