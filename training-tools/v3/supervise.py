@@ -23,11 +23,11 @@ try:
  import sys;sys.path.insert(0,str(ROOT))
  from train.data_utils import TextAudioLoaderMultiNSFsid,DistributedBucketSampler
  from train.utils import HParams
- c=json.loads((EXP/'config.json').read_text());dataset=TextAudioLoaderMultiNSFsid(str(EXP/'filelist.txt'),HParams(**c['data']));sampler=DistributedBucketSampler(dataset,2,[100,200,300,400,500,600,700,800,900],num_replicas=1,rank=0,shuffle=True);per=len(sampler);assert per>0
+ c=json.loads((EXP/'config.json').read_text());dataset=TextAudioLoaderMultiNSFsid(str(EXP/'filelist.txt'),HParams(**c['data']));sampler=DistributedBucketSampler(dataset,8,[100,200,300,400,500,600,700,800,900],num_replicas=1,rank=0,shuffle=True);per=len(sampler);assert per>0
  update(steps_per_epoch=per,target_steps=per*50,status='prepared')
  command([PYTHON,str(HOME/'publish.py'),'--progress','0','--steps','0'],'publish.log')
  env=os.environ.copy();env.update(RVC_CPU_PRECISION='fp32',RVC_PUBLISH_EPOCHS='1')
- args=[PYTHON,str(HOME/'cpu_train.py'),'-e',NAME,'-sr','32k','-f0','1','-bs','2','-g','0','-te','50','-se','10','-pg','assets/pretrained_v2/f0G32k.pth','-pd','assets/pretrained_v2/f0D32k.pth','-l','1','-c','1','-sw','1','-v','v2']
+ args=[PYTHON,str(HOME/'cpu_train.py'),'-e',NAME,'-sr','32k','-f0','1','-bs','8','-g','0','-te','50','-se','10','-pg','assets/pretrained_v2/f0G32k.pth','-pd','assets/pretrained_v2/f0D32k.pth','-l','1','-c','1','-sw','1','-v','v2']
  with (HOME/'train.log').open('wb') as log:
   active=subprocess.Popen(args,cwd=ROOT,env=env,stdout=log,stderr=subprocess.STDOUT,start_new_session=True)
   update(status='training',training_pid=active.pid)
