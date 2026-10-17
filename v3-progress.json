@@ -1,0 +1,10 @@
+{
+  "completed_epochs": 0,
+  "target_epochs": 50,
+  "completed_steps": 0,
+  "status": "preparing",
+  "latest_model_epoch": null,
+  "model_sha256": null,
+  "updated_at_utc": "2026-10-17T23:25:50Z",
+  "quality_approved": false
+}
