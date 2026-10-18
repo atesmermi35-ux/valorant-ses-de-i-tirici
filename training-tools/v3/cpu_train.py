@@ -40,4 +40,17 @@ if os.environ.get('RVC_PUBLISH_EPOCHS')=='1':
   else:
    subprocess.run([sys.executable,'/workspace/rvc-restart/publish.py','--progress',str(epoch),'--steps',str(trainer.global_step)],check=True)
  trainer.train_and_evaluate=epoch_with_backup
+if os.environ.get('RVC_RESUME_COMPLETED'):
+ completed=int(os.environ['RVC_RESUME_COMPLETED'])
+ original_load=trainer.utils.load_checkpoint
+ def resume_load(*args,**kwargs):
+  try:
+   result=original_load(*args,**kwargs)
+   assert result[3]==completed,(result[3],completed)
+   logger.info('Verified full checkpoint completed epoch %s; next epoch %s',completed,completed+1)
+   return (*result[:3],completed+1)
+  except BaseException:
+   logger.exception('Full checkpoint resume failed; refusing pretrained fallback')
+   os._exit(2)
+ trainer.utils.load_checkpoint=resume_load
 trainer.run(0,1,trainer.hps,logger,False)
