@@ -1,8 +1,8 @@
 # Yeni kayıtla RVC modeli
 
-**Son kaydedilen ilerleme: 27/50 epoch.**
+**Son kaydedilen ilerleme: 28/50 epoch.**
 
-Son güncelleme: 18.10.2026 06:34 (Türkiye saati).
+Son güncelleme: 18.10.2026 06:38 (Türkiye saati).
 
 **İndirilebilir son model: 20 epoch.**
 
