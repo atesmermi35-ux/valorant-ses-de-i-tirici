@@ -1,10 +1,10 @@
 # Yeni kayıtla RVC modeli
 
-**Son kaydedilen ilerleme: 19/50 epoch.**
+**Son kaydedilen ilerleme: 20/50 epoch.**
 
-Son güncelleme: 18.10.2026 05:53 (Türkiye saati).
+Son güncelleme: 18.10.2026 05:59 (Türkiye saati).
 
-**İndirilebilir son model: 10 epoch.**
+**İndirilebilir son model: 20 epoch.**
 
 [Model ZIP dosyasını indir](https://github.com/atesmermi35-ux/valorant-ses-de-i-tirici/raw/refs/heads/voice-model/DogalKadinTR-v3-latest.zip)
 
